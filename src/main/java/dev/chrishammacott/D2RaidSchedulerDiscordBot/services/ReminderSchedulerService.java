@@ -1,9 +1,7 @@
 package dev.chrishammacott.D2RaidSchedulerDiscordBot.services;
 
-import dev.chrishammacott.D2RaidSchedulerDiscordBot.database.model.ReminderRecord;
-import dev.chrishammacott.D2RaidSchedulerDiscordBot.database.services.RaidPostService;
-import dev.chrishammacott.D2RaidSchedulerDiscordBot.database.services.ReminderService;
-import dev.chrishammacott.D2RaidSchedulerDiscordBot.discordListeners.model.RaidPost;
+import dev.chrishammacott.D2RaidSchedulerDiscordBot.database.model.RaidInfo;
+import dev.chrishammacott.D2RaidSchedulerDiscordBot.database.services.RaidInfoService;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import org.slf4j.Logger;
@@ -26,15 +24,13 @@ public class ReminderSchedulerService {
     @Value("${reminder.offset}")
     private Long REMINDER_OFFSET;
     private final ScheduledExecutorService scheduleReminders = Executors.newSingleThreadScheduledExecutor();
-    private final RaidPostService raidPostService;
-    private final ReminderService reminderService;
+    private final RaidInfoService raidInfoService;
     private final Map<Long, ScheduledFuture<?>> scheduledRemindersMap = new HashMap<>();
     private final Map<Long, ScheduledFuture<?>> scheduledClosuresMap = new HashMap<>();
     private final JDA jda;
 
-    public ReminderSchedulerService(RaidPostService raidPostService, ReminderService reminderService, JDA jda) {
-        this.raidPostService = raidPostService;
-        this.reminderService = reminderService;
+    public ReminderSchedulerService(RaidInfoService raidInfoService, JDA jda) {
+        this.raidInfoService = raidInfoService;
         this.jda = jda;
     }
 
@@ -42,27 +38,27 @@ public class ReminderSchedulerService {
         scheduleReminders.shutdown();
     }
 
-    public ScheduledFuture<?> scheduleReminder(Long raidTime, RaidPost raidPost) {
+    public ScheduledFuture<?> scheduleReminder(Long raidTime, RaidInfo raidInfo) {
         Long reminderTime = raidTime - Instant.now().toEpochMilli() - REMINDER_OFFSET;
-        String message = raidPost.getAssignedRaidRole().getAsMention() + " - Raid in " + "<t:" + (raidTime/1000) + ":R>";
+        String message = jda.getRoleById(raidInfo.getRoleId()).getAsMention() + " - Raid in " + "<t:" + (raidTime/1000) + ":R>";
         Runnable task = () -> {
-            jda.getChannelById(TextChannel.class, raidPost.getDiscordReminderChannel()).sendMessage(message).queue();
+            jda.getChannelById(TextChannel.class, raidInfo.getReminderChannelId()).sendMessage(message).queue();
         };
         ScheduledFuture<?> scheduledFuture = scheduleReminders.schedule(task, reminderTime, TimeUnit.MILLISECONDS);
-        scheduledRemindersMap.put(raidPost.getDiscordPostId(), scheduledFuture);
-        reminderService.insert(new ReminderRecord(raidPost.getDiscordPostId(), raidPost.getDiscordReminderChannel(), reminderTime, message));
+        scheduledRemindersMap.put(raidInfo.getPostId(), scheduledFuture);
         return scheduledFuture;
     }
 
-    public ScheduledFuture<?> scheduleCloseRaidPost(Long raidTime, RaidPost raidPost) {
+    public ScheduledFuture<?> scheduleCloseRaidPost(Long raidTime, RaidInfo raidInfo) {
         Long closureTime = raidTime - Instant.now().toEpochMilli() + REMINDER_OFFSET;
         Runnable task = () -> {
-            raidPostService.deleteByPostId(raidPost.getDiscordPostId());
-            reminderService.deleteByPostId(raidPost.getDiscordPostId());
-            raidPost.getAssignedRaidRole().delete().queue();
+            raidInfoService.deleteByPostId(raidInfo.getPostId());
+            if (jda.getRoleById(raidInfo.getRoleId()) != null) {
+                jda.getRoleById(raidInfo.getRoleId()).delete().queue();
+            }
         };
         ScheduledFuture<?> scheduledFuture = scheduleReminders.schedule(task, closureTime, TimeUnit.MILLISECONDS);
-        scheduledClosuresMap.put(raidPost.getDiscordPostId(), scheduledFuture);
+        scheduledClosuresMap.put(raidInfo.getPostId(), scheduledFuture);
         return scheduledFuture;
     }
 

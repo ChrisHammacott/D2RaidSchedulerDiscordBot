@@ -28,10 +28,6 @@ public class ModalListener extends ListenerAdapter {
             logger.info("Modal Post event triggered");
             modalService.postModal(event);
         }
-        if (event.getModalId().equals("post_vote_modal")){
-            logger.info("Modal Post Vote event triggered");
-            modalService.postVoteModal(event);
-        }
     }
 
     public static Modal getPostVoteModal() {

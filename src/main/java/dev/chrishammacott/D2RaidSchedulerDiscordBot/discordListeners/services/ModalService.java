@@ -1,10 +1,13 @@
 package dev.chrishammacott.D2RaidSchedulerDiscordBot.discordListeners.services;
 
-import dev.chrishammacott.D2RaidSchedulerDiscordBot.database.services.RaidPostService;
+import dev.chrishammacott.D2RaidSchedulerDiscordBot.database.model.RaidInfo;
+import dev.chrishammacott.D2RaidSchedulerDiscordBot.database.services.RaidInfoService;
 import dev.chrishammacott.D2RaidSchedulerDiscordBot.discordListeners.model.PartialPost;
 import dev.chrishammacott.D2RaidSchedulerDiscordBot.discordListeners.model.PartialPostContainer;
 import dev.chrishammacott.D2RaidSchedulerDiscordBot.discordListeners.model.RaidPost;
+import dev.chrishammacott.D2RaidSchedulerDiscordBot.services.ReminderSchedulerService;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.emoji.RichCustomEmoji;
@@ -23,11 +26,13 @@ import java.util.List;
 public class ModalService {
 
     Logger logger = LoggerFactory.getLogger(ModalService.class);
-    private final RaidPostService raidPostService;
+    private final RaidInfoService raidInfoService;
+    private final ReminderSchedulerService reminderSchedulerService;
     private final PartialPostContainer partialPostContainer;
 
-    public ModalService(RaidPostService raidPostService, PartialPostContainer partialPostContainer) {
-        this.raidPostService = raidPostService;
+    public ModalService(RaidInfoService raidInfoService, ReminderSchedulerService reminderSchedulerService, PartialPostContainer partialPostContainer) {
+        this.raidInfoService = raidInfoService;
+        this.reminderSchedulerService = reminderSchedulerService;
         this.partialPostContainer = partialPostContainer;
     }
 
@@ -45,56 +50,24 @@ public class ModalService {
             return;
         }
 
-        List<RichCustomEmoji> emojiList = event.getGuild().getEmojis();
-        RichCustomEmoji emoji = emojiList.get(new Random().nextInt(emojiList.size()));
-        HashMap<RichCustomEmoji, Date> emojiDateHashMap = new HashMap<>();
-        emojiDateHashMap.put(emoji, dateTime);
+        List<Long> emojiIds = event.getGuild().getEmojis().stream().map(ISnowflake::getIdLong).toList();
+        Long emojiId = emojiIds.get(new Random().nextInt(emojiIds.size()));
+        HashMap<Long, Long> emojiIdDateMap = new HashMap<>();
+        emojiIdDateMap.put(emojiId, dateTime.getTime());
 
+        RichCustomEmoji emoji = event.getGuild().getEmojiById(emojiId);
         MessageEmbed embedMessage = createEmbedPost(partialPost.getRaidName(), partialPost.getOrganiser(), partialPost.getMinRaiders(), dateTime, message, emoji);
         TextChannel textChannel = event.getGuild().getChannelById(TextChannel.class, partialPost.getPostChannel());
         textChannel.sendMessage(partialPost.getRole().getAsMention()).queue();
         textChannel.sendMessageEmbeds(embedMessage) .queue((messageObject -> {
             messageObject.addReaction(emoji).queue();
-
-            RaidPost raidPost = new RaidPost(messageObject.getIdLong(), partialPost.getReminderChannel(), partialPost.getMinRaiders(), emojiDateHashMap);
-            raidPostService.save(raidPost);
+            RaidInfo raidInfo = new RaidInfo(partialPost.getRaidName(), messageObject.getIdLong(), partialPost.getReminderChannel(), partialPost.getMinRaiders(), emojiIdDateMap);
+            raidInfoService.save(raidInfo);
+            reminderSchedulerService.scheduleCloseRaidPost(dateTime.getTime(), raidInfo);
             logger.info("Standard Raid Post Created");
         }));
 
         event.reply("Raid Post has been queued").queue();
-    }
-
-    public void postVoteModal(ModalInteractionEvent event) {
-        PartialPost partialPost = partialPostContainer.getPartialPost();
-        String rawDateTimes = event.getValue("date_time").getAsString();
-        String[] splitDateTimes = rawDateTimes.split("\n");
-        String message = event.getValue("message").getAsString();
-
-        if (splitDateTimes.length == 0){
-            event.reply("No date times given").queue();
-            return;
-        }
-
-        List<RichCustomEmoji> emojiList = new ArrayList<>(event.getGuild().getEmojis());
-        Map<RichCustomEmoji, Date> emojiDateMap;
-        try {
-            emojiDateMap = getEmojiDateMap(emojiList, splitDateTimes);
-        } catch (IllegalArgumentException e) {
-            event.reply(e.getMessage()).queue();
-            return;
-        }
-
-        MessageEmbed embedMessage = createEmbedPost(partialPost.getRaidName(), partialPost.getOrganiser(), partialPost.getMinRaiders(), message, emojiDateMap);
-        TextChannel textChannel = event.getGuild().getChannelById(TextChannel.class, partialPost.getPostChannel());
-        textChannel.sendMessage(partialPost.getRole().getAsMention()).queue();
-        textChannel.sendMessageEmbeds(embedMessage).queue((messageObject -> {
-            emojiDateMap.forEach((emoji, date) -> messageObject.addReaction(emoji).queue());
-
-            RaidPost raidPost = new RaidPost(messageObject.getIdLong(), partialPost.getReminderChannel(), partialPost.getMinRaiders(), emojiDateMap);
-            raidPostService.save(raidPost);
-            logger.info("Vote Raid Post Created");
-        }));
-        event.reply("Raid has been queued").queue();
     }
 
     private Map<RichCustomEmoji, Date> getEmojiDateMap(List<RichCustomEmoji> emojiList, String[] splitDateTimes){

@@ -65,16 +65,6 @@ public class CommandListener extends ListenerAdapter {
                 .addOptions(reminderChannel2)
                 .addOptions(roleMention));
 
-        // post vote time command
-        commandList.add(Commands.slash("post_vote", "schedule a raid with voting")
-                .addOptions(raidName)
-                .addOptions(organiser)
-                .addOptions(postChannel)
-                .addOptions(reminderChannel2)
-                .addOptions(roleMention));
-
-        // remove post from active posts
-
         event.getGuild().updateCommands().addCommands(commandList).queue();
         logger.info("Discord Commands set.");
     }
@@ -89,7 +79,6 @@ public class CommandListener extends ListenerAdapter {
         }
         boolean configEmpty = configService.getConfig().isEmpty();
         if (configEmpty){
-            //todo update so that other commands have not been added till setup has been run?
             logger.info("User ran command without setup");
             event.reply("setup command not run").queue();
             return;
@@ -97,10 +86,6 @@ public class CommandListener extends ListenerAdapter {
         if (command.equals("post")){
             logger.info("Post Command Run.");
             commandService.post(event);
-        }
-        if (command.equals("post_vote")){
-            logger.info("Post Vote Command Run.");
-            commandService.votePost(event);
         }
     }
 }

@@ -16,7 +16,7 @@ public class MainController {
 
     @GetMapping("/")
     public String viewMainPage(Model model) {
-        model.addAttribute("raidPostList", raidInfoService.getAllPosts());
+        model.addAttribute("raidInfoList", raidInfoService.getAllFormattedPosts());
         return "index";
     }
 }

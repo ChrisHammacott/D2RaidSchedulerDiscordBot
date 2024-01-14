@@ -1,7 +1,6 @@
 package dev.chrishammacott.D2RaidSchedulerDiscordBot.database.mongoRepositories;
 
 import dev.chrishammacott.D2RaidSchedulerDiscordBot.database.model.RaidInfo;
-import dev.chrishammacott.D2RaidSchedulerDiscordBot.database.model.RaidPostRecord;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.Optional;

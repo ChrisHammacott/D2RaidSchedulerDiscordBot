@@ -4,7 +4,6 @@ import dev.chrishammacott.D2RaidSchedulerDiscordBot.database.model.RaidInfo;
 import dev.chrishammacott.D2RaidSchedulerDiscordBot.database.services.RaidInfoService;
 import dev.chrishammacott.D2RaidSchedulerDiscordBot.discordListeners.model.PartialPost;
 import dev.chrishammacott.D2RaidSchedulerDiscordBot.discordListeners.model.PartialPostContainer;
-import dev.chrishammacott.D2RaidSchedulerDiscordBot.discordListeners.model.RaidPost;
 import dev.chrishammacott.D2RaidSchedulerDiscordBot.services.ReminderSchedulerService;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.ISnowflake;

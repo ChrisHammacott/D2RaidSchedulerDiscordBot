@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="ISO-8859-1">
-    <title>Employee</title>
+    <title>Raids</title>
     <link rel="stylesheet"
           href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
           integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
@@ -16,16 +16,20 @@
            class = "table table-striped table-responsive-md">
         <thead>
         <tr>
-            <th>PostId</th>
+            <th>Raid Name</th>
             <th>Min Raiders</th>
-            <th>Role</th>
+            <th>Reminder Channel</th>
+            <th>User List</th>
+            <th>Date Time</th>
         </tr>
         </thead>
         <tbody>
-        <tr th:each="raidPost:${raidPostList}">
-            <td th:text="${raidPost.discordPostId}"></td>
-            <td th:text="${raidPost.minimumRaiders}"></td>
-            <td th:text="${raidPost.assignedRaidRole.getName()}"></td>
+        <tr th:each="raidInfo:${raidInfoList}">
+            <td th:text="${raidInfo.raidName}"></td>
+            <td th:text="${raidInfo.minRaiders}"></td>
+            <td th:text="${raidInfo.reminderChannel}"></td>
+            <td th:text="${raidInfo.userNameList.toString()}"></td>
+            <td th:text="${raidInfo.emojiDateMap.toString()}"></td>
         </tr>
         </tbody>
     </table>

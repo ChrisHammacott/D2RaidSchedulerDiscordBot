@@ -61,7 +61,7 @@ public class PostService {
         return stringBuilder.toString();
     }
 
-    public String getDateIdentifier(long dateTime) {
+    public static String getDateIdentifier(long dateTime) {
         SimpleDateFormat outputFormatterTime = new SimpleDateFormat("dd/MM/yy@HH:mm", Locale.UK);
         return outputFormatterTime.format(new Date(dateTime));
     }

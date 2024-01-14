@@ -6,7 +6,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Document
 public class RaidInfo {
@@ -15,30 +14,36 @@ public class RaidInfo {
     private String id;
     private final String raidName;
     private final long postId;
+    private final long postChannelId;
     private final long reminderChannelId;
     private final int minRaiders;
     private Long roleId;
-    private final Map<Long,Long> emojiIdDateMap;
+    private final long emojiId;
+    private final long dateTime;
     private final List<Long> userIdList;
 
     @PersistenceCreator
-    public RaidInfo(String id, String raidName, long postId, long reminderChannelId, int minRaiders, Long roleId, Map<Long, Long> emojiIdDateMap, List<Long> userIdList) {
+    public RaidInfo(String id, String raidName, long postId, long postChannelId, long reminderChannelId, int minRaiders, Long roleId, long emojiId, long dateTime, List<Long> userIdList) {
         this.id = id;
         this.raidName = raidName;
         this.postId = postId;
+        this.postChannelId = postChannelId;
         this.reminderChannelId = reminderChannelId;
         this.minRaiders = minRaiders;
         this.roleId = roleId;
-        this.emojiIdDateMap = emojiIdDateMap;
+        this.emojiId = emojiId;
+        this.dateTime = dateTime;
         this.userIdList = userIdList;
     }
 
-    public RaidInfo(String raidName, long postId, long reminderChannelId, int minRaiders, Map<Long, Long> emojiIdDateMap) {
+    public RaidInfo(String raidName, long postId, long postChannelId, long reminderChannelId, int minRaiders, long emojiId, long dateTime) {
         this.raidName = raidName;
         this.postId = postId;
+        this.postChannelId = postChannelId;
         this.reminderChannelId = reminderChannelId;
         this.minRaiders = minRaiders;
-        this.emojiIdDateMap = emojiIdDateMap;
+        this.emojiId = emojiId;
+        this.dateTime = dateTime;
         userIdList = new ArrayList<>();
     }
 
@@ -52,6 +57,10 @@ public class RaidInfo {
 
     public long getPostId() {
         return postId;
+    }
+
+    public long getPostChannelId() {
+        return postChannelId;
     }
 
     public long getReminderChannelId() {
@@ -70,20 +79,12 @@ public class RaidInfo {
         this.roleId = roleId;
     }
 
-    public Map<Long, Long> getEmojiIdDateMap() {
-        return emojiIdDateMap;
+    public long getEmojiId() {
+        return emojiId;
     }
 
-    public Long getDate(long emojiId) {
-        return emojiIdDateMap.get(emojiId);
-    }
-
-    public boolean hasVote() {
-        return emojiIdDateMap.size() > 1;
-    }
-
-    public boolean isRegisteredEmoji(long emoji) {
-        return emojiIdDateMap.containsKey(emoji);
+    public long getDateTime() {
+        return dateTime;
     }
 
     public List<Long> getUserIdList() {

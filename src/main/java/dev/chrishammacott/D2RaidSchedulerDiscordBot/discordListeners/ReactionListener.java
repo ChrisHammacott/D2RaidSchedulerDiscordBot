@@ -53,7 +53,7 @@ public class ReactionListener extends ListenerAdapter {
         } catch (IllegalStateException e) {
             return;
         }
-        if (!raidInfo.isRegisteredEmoji(eventEmojiId)){
+        if (raidInfo.getEmojiId() != eventEmojiId){
             event.getChannel().retrieveMessageById(event.getMessageIdLong()).queue(message -> message.removeReaction(event.getEmoji(), event.getUser()).queue());
             return;
         }
@@ -73,7 +73,7 @@ public class ReactionListener extends ListenerAdapter {
         raidInfoService.save(raidInfo);
         if (raidInfo.getUserIdList().size() == raidInfo.getMinRaiders()) {
             event.getGuild().createRole()
-                    .setName("RaidTeam-" + postService.getDateIdentifier(raidInfo.getDate(eventEmojiId)))
+                    .setName("RaidTeam-" + postService.getDateIdentifier(raidInfo.getDateTime()))
                     .setColor(Color.orange)
                     .queue(role -> {
                         raidInfo.setRoleId(role.getIdLong());
@@ -86,7 +86,7 @@ public class ReactionListener extends ListenerAdapter {
                         event.getGuild().getChannelById(TextChannel.class, raidInfo.getReminderChannelId()).sendMessage(message).queue();
 
                         raidInfoService.save(raidInfo);
-                        reminderSchedulerService.scheduleReminder(raidInfo.getDate(eventEmojiId), raidInfo);
+                        reminderSchedulerService.scheduleReminder(raidInfo.getDateTime(), raidInfo);
                     });
         }
         if (raidInfo.getUserIdList().size() > raidInfo.getMinRaiders() && raidInfo.getUserIdList().size() <= 6) {
@@ -123,7 +123,7 @@ public class ReactionListener extends ListenerAdapter {
 
         raidInfo.removeUser(event.getUser().getIdLong());
         raidInfoService.save(raidInfo);
-        if (!raidInfo.isRegisteredEmoji(eventEmojiId) || raidInfo.getUserIdList().size()+1 < raidInfo.getMinRaiders()){
+        if (raidInfo.getEmojiId() != eventEmojiId || raidInfo.getUserIdList().size()+1 < raidInfo.getMinRaiders()){
             return;
         }
 
@@ -132,7 +132,7 @@ public class ReactionListener extends ListenerAdapter {
         event.getGuild().getChannelById(TextChannel.class, raidInfo.getReminderChannelId()).sendMessage(dropoutMessage).queue();
 
         if (raidInfo.getUserIdList().size() < raidInfo.getMinRaiders()){
-            String cancelledMessage = postService.getRaidCancelledPost(raidInfo, raidInfo.getDate(eventEmojiId));
+            String cancelledMessage = postService.getRaidCancelledPost(raidInfo, raidInfo.getDateTime());
             event.getGuild().getChannelById(TextChannel.class, raidInfo.getReminderChannelId()).sendMessage(cancelledMessage).queue();
 
             role.delete().queue();

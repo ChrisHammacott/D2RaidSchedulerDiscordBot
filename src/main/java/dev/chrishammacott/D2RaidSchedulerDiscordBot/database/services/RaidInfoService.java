@@ -42,15 +42,12 @@ public class RaidInfoService {
         List<WebRaidInfo> webRaidInfoList = new ArrayList<>();
         for (RaidInfo raidInfo : raidInfoList) {
             String reminderChannel = jda.getChannelById(TextChannel.class, raidInfo.getReminderChannelId()).getName();
-            Map<String, String> emojiDateFormattedMap = new HashMap<>();
-            for (Map.Entry<Long, Long> entry : raidInfo.getEmojiIdDateMap().entrySet()) {
-                emojiDateFormattedMap.put(jda.getEmojiById(entry.getKey()).getName(), PostService.getDateIdentifier(entry.getValue()));
-            }
+            String dateTime = PostService.getDateIdentifier(raidInfo.getDateTime());
             List<String> userNameList = new ArrayList<>();
             for (long userId : raidInfo.getUserIdList()) {
                 userNameList.add(jda.getUserById(userId).getName());
             }
-            webRaidInfoList.add(new WebRaidInfo(raidInfo.getId(), raidInfo.getRaidName(), raidInfo.getPostId(), reminderChannel, raidInfo.getMinRaiders(), emojiDateFormattedMap, userNameList));
+            webRaidInfoList.add(new WebRaidInfo(raidInfo.getId(), raidInfo.getRaidName(), raidInfo.getPostId(), reminderChannel, raidInfo.getMinRaiders(), dateTime, userNameList));
         }
         return webRaidInfoList;
     }

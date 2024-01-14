@@ -51,8 +51,6 @@ public class ModalService {
 
         List<Long> emojiIds = event.getGuild().getEmojis().stream().map(ISnowflake::getIdLong).toList();
         Long emojiId = emojiIds.get(new Random().nextInt(emojiIds.size()));
-        HashMap<Long, Long> emojiIdDateMap = new HashMap<>();
-        emojiIdDateMap.put(emojiId, dateTime.getTime());
 
         RichCustomEmoji emoji = event.getGuild().getEmojiById(emojiId);
         MessageEmbed embedMessage = createEmbedPost(partialPost.getRaidName(), partialPost.getOrganiser(), partialPost.getMinRaiders(), dateTime, message, emoji);
@@ -60,32 +58,13 @@ public class ModalService {
         textChannel.sendMessage(partialPost.getRole().getAsMention()).queue();
         textChannel.sendMessageEmbeds(embedMessage) .queue((messageObject -> {
             messageObject.addReaction(emoji).queue();
-            RaidInfo raidInfo = new RaidInfo(partialPost.getRaidName(), messageObject.getIdLong(), partialPost.getReminderChannel(), partialPost.getMinRaiders(), emojiIdDateMap);
+            RaidInfo raidInfo = new RaidInfo(partialPost.getRaidName(), messageObject.getIdLong(), partialPost.getPostChannel(), partialPost.getReminderChannel(), partialPost.getMinRaiders(), emojiId, dateTime.getTime());
             raidInfoService.save(raidInfo);
             reminderSchedulerService.scheduleCloseRaidPost(dateTime.getTime(), raidInfo);
             logger.info("Standard Raid Post Created");
         }));
 
         event.reply("Raid Post has been queued").queue();
-    }
-
-    private Map<RichCustomEmoji, Date> getEmojiDateMap(List<RichCustomEmoji> emojiList, String[] splitDateTimes){
-        Map<RichCustomEmoji, Date> emojiDateMap = new HashMap<>();
-        for (String rawDateTime : splitDateTimes) {
-            String[] dateAndTime = rawDateTime.split("@");
-            if (dateAndTime.length != 2) {
-                throw new IllegalArgumentException(String.format("Unable to process given date time [%s] value", rawDateTime));
-            }
-            Date dateTime;
-            try {
-                dateTime = getDateTime(dateAndTime[0],dateAndTime[1]);
-            } catch (ParseException e) {
-                throw new IllegalArgumentException(String.format("Unable to process date [%s] and time [%s] values", dateAndTime[0], dateAndTime[1]));
-            }
-            int randomNum = new Random().nextInt(emojiList.size());
-            emojiDateMap.put(emojiList.remove(randomNum), dateTime);
-        }
-        return emojiDateMap;
     }
 
     private Date getDateTime(String date, String time) throws ParseException {

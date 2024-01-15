@@ -38,9 +38,10 @@ public class ReminderSchedulerService {
         scheduleReminders.shutdown();
     }
 
-    public ScheduledFuture<?> scheduleReminder(Long raidTime, RaidInfo raidInfo) {
-        Long reminderTime = raidTime - Instant.now().toEpochMilli() - REMINDER_OFFSET;
-        String message = jda.getRoleById(raidInfo.getRoleId()).getAsMention() + " - Raid in " + "<t:" + (raidTime/1000) + ":R>";
+    public ScheduledFuture<?> scheduleReminder(long raidTime, RaidInfo raidInfo) {
+        long reminderTime = raidTime - Instant.now().toEpochMilli() - REMINDER_OFFSET;
+        long raidTimeSecond = Instant.ofEpochMilli(raidTime).getEpochSecond();
+        String message = jda.getRoleById(raidInfo.getRoleId()).getAsMention() + " - Raid " + "<t:" + raidTimeSecond + ":R>";
         Runnable task = () -> {
             jda.getChannelById(TextChannel.class, raidInfo.getReminderChannelId()).sendMessage(message).queue();
         };
@@ -49,8 +50,8 @@ public class ReminderSchedulerService {
         return scheduledFuture;
     }
 
-    public ScheduledFuture<?> scheduleCloseRaidPost(Long raidTime, RaidInfo raidInfo) {
-        Long closureTime = raidTime - Instant.now().toEpochMilli() + REMINDER_OFFSET;
+    public ScheduledFuture<?> scheduleCloseRaidPost(long raidTime, RaidInfo raidInfo) {
+        long closureTime = raidTime - Instant.now().toEpochMilli() + REMINDER_OFFSET;
         Runnable task = () -> {
             raidInfoService.deleteByPostId(raidInfo.getPostId());
             if (jda.getRoleById(raidInfo.getRoleId()) != null) {

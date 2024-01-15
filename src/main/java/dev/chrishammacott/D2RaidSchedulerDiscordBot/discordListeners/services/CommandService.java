@@ -90,7 +90,6 @@ public class CommandService {
         if (roleMentionOption != null){
             role = roleMentionOption.getAsRole();
         }
-
         partialPostContainer.setPartialPost(new PartialPost(raidName, postChannel, reminderChannel, role, organiser, minRaiders));
     }
 }

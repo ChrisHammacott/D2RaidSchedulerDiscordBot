@@ -54,10 +54,11 @@ public class PostService {
 
     public String getRaidCancelledPost(RaidInfo raidInfo, long dateTime) {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("Raid ").append(raidInfo.getRaidName()).append(", on").append(getDateIdentifier(dateTime)).append(" is bellow minimum raiders. Raid currently Cancelled cc");
+        stringBuilder.append("Raid ").append(raidInfo.getRaidName()).append(", on ").append(getDateIdentifier(dateTime)).append(" is bellow minimum raiders. Raid cancelled").append("\n");
         for (Long userId : raidInfo.getUserIdList()){
-            stringBuilder.append(jda.getUserById(userId).getAsMention());
+            stringBuilder.append(jda.getUserById(userId).getAsMention()).append(", ");
         }
+        stringBuilder.replace(stringBuilder.length()-3, stringBuilder.length()-1, ".");
         return stringBuilder.toString();
     }
 

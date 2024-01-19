@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="ISO-8859-1">
+    <title>Raids</title>
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+          integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+          crossorigin="anonymous">
+    <link th:href="@{/styles/index.css}" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<div class="split left">
+    <div class="padded">
+        <h2>Raid List</h2>
+        <table style="width:90%" border="1"
+               class = "table table-responsive-md">
+            <thead>
+            <tr>
+                <th>Raid Name</th>
+                <th>Min Raiders</th>
+                <th>Reminder Channel</th>
+                <th>Date Time</th>
+                <th>User List</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="raidInfo:${raidInfoList}">
+                <td th:text="${raidInfo.raidName}"></td>
+                <td th:text="${raidInfo.minRaiders}"></td>
+                <td th:text="${raidInfo.reminderChannel}"></td>
+                <td th:text="${raidInfo.dateTime}"></td>
+                <td th:text="${raidInfo.userNameList.toString()}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="split right">
+    <h2 >Create Raid Post</h2>
+</div>
+</body>
+</html>

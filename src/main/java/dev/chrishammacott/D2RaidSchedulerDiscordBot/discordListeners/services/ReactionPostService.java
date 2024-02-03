@@ -4,6 +4,8 @@ import dev.chrishammacott.D2RaidSchedulerDiscordBot.database.model.RaidInfo;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
@@ -12,10 +14,11 @@ import java.util.List;
 import java.util.Locale;
 
 @Service
-public class PostService {
+public class ReactionPostService {
 
+    Logger logger = LoggerFactory.getLogger(this.getClass());
     private final JDA jda;
-    public PostService(JDA jda) {
+    public ReactionPostService(JDA jda) {
         this.jda = jda;
     }
 
@@ -23,8 +26,8 @@ public class PostService {
         return user.getAsMention() + " has joined the fray! cc" + role.getAsMention();
     }
 
-    public String getReservesPost(User user, Role role) {
-        return user.getAsMention() + " is a reserve. cc" + role.getAsMention();
+    public String getReservesPost(User user, String raidName) {
+        return user.getAsMention() + " is a reserve for " + raidName;
     }
 
     public String getDropoutPost(User user, Role role) {
@@ -52,13 +55,15 @@ public class PostService {
         return stringBuilder.toString();
     }
 
-    public String getRaidCancelledPost(RaidInfo raidInfo, long dateTime) {
+    public String getRaidCancelledPost(RaidInfo raidInfo, long eventEmojiId) {
+        long dateTime = raidInfo.getDateTime(eventEmojiId);
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Raid ").append(raidInfo.getRaidName()).append(", on ").append(getDateIdentifier(dateTime)).append(" is bellow minimum raiders. Raid cancelled").append("\n");
-        for (Long userId : raidInfo.getUserIdList()){
+        for (Long userId : raidInfo.getUserIdList(eventEmojiId)){
             stringBuilder.append(jda.getUserById(userId).getAsMention()).append(", ");
         }
-        stringBuilder.replace(stringBuilder.length()-3, stringBuilder.length()-1, ".");
+        logger.info(stringBuilder.toString());
+        stringBuilder.replace(stringBuilder.length()-2, stringBuilder.length(), ".");
         return stringBuilder.toString();
     }
 

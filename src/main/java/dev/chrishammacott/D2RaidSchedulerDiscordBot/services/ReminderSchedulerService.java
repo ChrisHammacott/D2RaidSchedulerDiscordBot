@@ -50,16 +50,17 @@ public class ReminderSchedulerService {
         return scheduledFuture;
     }
 
-    public ScheduledFuture<?> scheduleCloseRaidPost(long raidTime, RaidInfo raidInfo) {
+    public ScheduledFuture<?> scheduleCloseRaidPost(long raidTime, long postId) {
         long closureTime = raidTime - Instant.now().toEpochMilli() + REMINDER_OFFSET;
         Runnable task = () -> {
-            raidInfoService.deleteByPostId(raidInfo.getPostId());
+            RaidInfo raidInfo = raidInfoService.getRaidPost(postId).get();
+            raidInfoService.deleteByPostId(postId);
             if (jda.getRoleById(raidInfo.getRoleId()) != null) {
                 jda.getRoleById(raidInfo.getRoleId()).delete().queue();
             }
         };
         ScheduledFuture<?> scheduledFuture = scheduleReminders.schedule(task, closureTime, TimeUnit.MILLISECONDS);
-        scheduledClosuresMap.put(raidInfo.getPostId(), scheduledFuture);
+        scheduledClosuresMap.put(postId, scheduledFuture);
         return scheduledFuture;
     }
 

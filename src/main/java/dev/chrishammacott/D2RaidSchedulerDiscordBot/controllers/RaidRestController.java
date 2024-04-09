@@ -19,9 +19,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
-
-import static org.awaitility.Awaitility.await;
 
 @Controller
 public class RaidRestController {
@@ -61,7 +60,7 @@ public class RaidRestController {
         List<RichCustomEmoji> emojiList = new ArrayList<>(jda.getEmojis());
         for (LocalDateTime localDateTime : formData.getDateTimeList()) {
             RichCustomEmoji emoji = emojiList.get(new Random().nextInt(emojiList.size()));
-            emojiDateHashMap.put(emoji, java.sql.Timestamp.valueOf(localDateTime));
+            emojiDateHashMap.put(emoji, new Date(localDateTime.atZone(ZoneId.systemDefault()).toEpochSecond()));
             emojiList.remove(emoji);
         }
         return new PartialPost(formData.getRaidName(), formData.getPostChannelId(), formData.getReminderChannelId(), role, organiser, formData.getMinRaiders(), emojiDateHashMap, formData.getMessage());

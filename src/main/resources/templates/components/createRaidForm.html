@@ -1,0 +1,42 @@
+<div hx-target="this" hx-swap="outerHTML" xmlns:th="http://www.thymeleaf.org">
+    <h2 >Create Raid Post</h2>
+    <form hx-post="/raid">
+
+        <label for="raidName">Raid name</label>
+        <input id="raidName" type="text" name="raidName" minlength="3" maxlength="30" required><br>
+
+        <label for="userId">Organiser</label>
+        <select id="userId" name="userId" required>
+            <option value="" selected disabled hidden>Select Organiser</option>
+            <option th:each="userName:${userList}" th:value="${userName.id}" th:text="${userName.name}"></option>
+        </select><br>
+
+        <label for="minRaiders">Minimum Raiders</label>
+        <input type="number" id="minRaiders" name="minRaiders" min="3" max="6" value="6"><br>
+
+        <label for="postChannelId">Post Channel</label>
+        <select id="postChannelId" name="postChannelId" required>
+            <option th:if="${!defaults.set}" value="" selected disabled hidden>Select Channel</option>
+            <option th:selected="${defaults.defaultPostChannelId == channel.id}" th:each="channel:${channels}" th:value="${channel.id}" th:text="${channel.name}"></option>
+        </select><br>
+
+        <label for="reminderChannelId">Reminder Channel</label>
+        <select id="reminderChannelId" name="reminderChannelId" required>
+            <option th:if="${!defaults.set}" value="" selected disabled hidden>Select Channel</option>
+            <option th:selected="${defaults.defaultReminderChannelId == channel.id}" th:each="channel:${channels}" th:value="${channel.id}" th:text="${channel.name}"></option>
+        </select><br>
+
+        <label for="mentionRoleId">Mention Role</label>
+        <select id="mentionRoleId" name="mentionRoleId" required>
+            <option th:if="${!defaults.set}" value="" selected disabled hidden>Select Role</option>
+            <option th:selected="${defaults.defaultRoleId == role.id}" th:each="role:${roles}" th:value="${role.id}" th:text="${role.name}"></option>
+        </select><br>
+
+        <div hx-target="this" hx-swap="outerHTML" hx-trigger="load" hx-get="/views/createRaidForm/initialDateTimeInput"></div>
+
+        <label for="message">Message</label><br>
+        <textarea id="message" name="message" rows="4" cols="50" maxlength="200" minlength="7" required>Hi All! </textarea><br>
+
+        <button type="submit">Create raid</button>
+    </form>
+</div>

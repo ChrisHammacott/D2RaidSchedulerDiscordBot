@@ -1,11 +1,12 @@
 package dev.chrishammacott.D2RaidSchedulerDiscordBot.database.model;
 
+import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.entities.emoji.RichCustomEmoji;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.PersistenceCreator;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Document
 public class RaidInfo {
@@ -18,12 +19,11 @@ public class RaidInfo {
     private final long reminderChannelId;
     private final int minRaiders;
     private Long roleId;
-    private final long emojiId;
-    private final long dateTime;
-    private final List<Long> userIdList;
+    private final Map<Long, Long> emojiDateTimeMap;
+    private final Map<Long, List<Long>> emojiUserListMap;
 
     @PersistenceCreator
-    public RaidInfo(String id, String raidName, long postId, long postChannelId, long reminderChannelId, int minRaiders, Long roleId, long emojiId, long dateTime, List<Long> userIdList) {
+    public RaidInfo(String id, String raidName, long postId, long postChannelId, long reminderChannelId, int minRaiders, Long roleId, HashMap<Long, Long> emojiDateTimeMap, Map<Long, List<Long>> emojiUserListMap) {
         this.id = id;
         this.raidName = raidName;
         this.postId = postId;
@@ -31,20 +31,21 @@ public class RaidInfo {
         this.reminderChannelId = reminderChannelId;
         this.minRaiders = minRaiders;
         this.roleId = roleId;
-        this.emojiId = emojiId;
-        this.dateTime = dateTime;
-        this.userIdList = userIdList;
+        this.emojiDateTimeMap = emojiDateTimeMap;
+        this.emojiUserListMap = emojiUserListMap;
     }
 
-    public RaidInfo(String raidName, long postId, long postChannelId, long reminderChannelId, int minRaiders, long emojiId, long dateTime) {
+    public RaidInfo(String raidName, long postId, long postChannelId, long reminderChannelId, int minRaiders, Map<Long, Long> emojiDateTimeMap) {
         this.raidName = raidName;
         this.postId = postId;
         this.postChannelId = postChannelId;
         this.reminderChannelId = reminderChannelId;
         this.minRaiders = minRaiders;
-        this.emojiId = emojiId;
-        this.dateTime = dateTime;
-        userIdList = new ArrayList<>();
+        this.emojiDateTimeMap = emojiDateTimeMap;
+        emojiUserListMap = new HashMap<>();
+        for (var entry : emojiDateTimeMap.entrySet()) {
+            emojiUserListMap.put(entry.getKey(), new ArrayList<>());
+        }
     }
 
     public String getId() {
@@ -79,23 +80,35 @@ public class RaidInfo {
         this.roleId = roleId;
     }
 
-    public long getEmojiId() {
-        return emojiId;
+    public Map<Long, Long> getEmojiDateTimeMap() {
+        return emojiDateTimeMap;
     }
 
-    public long getDateTime() {
-        return dateTime;
+    public Map<Long, List<Long>> getEmojiUserListMap() {
+        return emojiUserListMap;
     }
 
-    public List<Long> getUserIdList() {
-        return userIdList;
+    public boolean hasVote() {
+        return emojiDateTimeMap.size() > 1;
     }
 
-    public void addUser(long userId) {
-        userIdList.add(userId);
+    public boolean isRegisteredEmoji(long emojiId) {
+        return emojiDateTimeMap.containsKey(emojiId);
     }
 
-    public void removeUser(long userId) {
-        userIdList.remove(userId);
+    public long getDateTime(long emojiId) {
+        return emojiDateTimeMap.get(emojiId);
+    }
+
+    public List<Long> getUserIdList(long emojiId) {
+        return emojiUserListMap.get(emojiId);
+    }
+
+    public void addUser(long emojiId, long userId) {
+        emojiUserListMap.get(emojiId).add(userId);
+    }
+
+    public void removeUser(long emojiId, long userId) {
+        emojiUserListMap.get(emojiId).remove(userId);
     }
 }

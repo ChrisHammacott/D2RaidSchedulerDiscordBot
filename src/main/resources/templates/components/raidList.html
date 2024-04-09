@@ -1,0 +1,28 @@
+<div class="padded" xmlns:th="http://www.thymeleaf.org">
+  <h2>Raid List</h2>
+  <table style="width:90%" border="1"
+         class = "table table-responsive-md">
+    <thead>
+    <tr>
+      <th>Raid Name</th>
+      <th>Min Raiders</th>
+      <th>Reminder Channel</th>
+      <th>Date Time</th>
+      <th>Signed Up</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="raidInfo:${raidInfoList}">
+      <td th:text="${raidInfo.raidName}"></td>
+      <td th:text="${raidInfo.minRaiders}"></td>
+      <td th:text="${raidInfo.reminderChannel}"></td>
+      <td th:text="${raidInfo.dateTime}"></td>
+      <td>
+        <div th:each="usersList:${raidInfo.usersList}">
+          <label th:text="${usersList}"></label>
+        </div>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</div>

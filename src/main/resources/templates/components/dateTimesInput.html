@@ -1,0 +1,9 @@
+<div hx-target="this" hx-swap="outerHTML" xmlns:th="http://www.w3.org/1999/xhtml">
+  <input type="hidden" name="noDateTimes" th:value="${numOfDateTimes}">
+  <label for="addDateTimes">Raid Dates</label>
+  <button th:if="${numOfDateTimes < 4}" id="addDateTimes" type="button" hx-post="/views/createRaidForm/DateTimeInput" hx-include="[name='noDateTimes']">Add DateTime</button>
+  <div th:each="i : ${#numbers.sequence(0, numOfDateTimes-1)}">
+    <label for="dateTimes">Time: </label>
+    <input id="dateTimes" th:name="dateTimeList[__${i}__]" type="datetime-local" th:attr="min=${minDateTime}" required><br>
+  </div>
+</div>

@@ -35,7 +35,6 @@ public class CommandListener extends ListenerAdapter {
     @Override
     public void onGuildReady(GuildReadyEvent event) {
         List<CommandData> commandList = new ArrayList<>();
-
         // setup command
         OptionData raidChannel = new OptionData(OptionType.CHANNEL, "raid_channel", "set channel to post raid schedule posts")
                 .setChannelTypes(ChannelType.TEXT)

@@ -71,7 +71,13 @@ public class PartialPost {
 
     public Date getLastDate() {
         List<Date> list = new ArrayList<Date>(emojiDateHashMap.values());
-        return Collections.max(list);
+        Date lastDate = new Date(0);
+        for (Date date : list) {
+            if (date.after(lastDate)) {
+                lastDate = date;
+            }
+        }
+        return lastDate;
     }
 
     public void setEmojiDateHashMap(HashMap<RichCustomEmoji, Date> emojiDateHashMap) {

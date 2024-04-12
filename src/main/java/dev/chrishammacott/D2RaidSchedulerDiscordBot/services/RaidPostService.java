@@ -1,6 +1,5 @@
 package dev.chrishammacott.D2RaidSchedulerDiscordBot.services;
 
-import dev.chrishammacott.D2RaidSchedulerDiscordBot.database.model.RaidInfo;
 import dev.chrishammacott.D2RaidSchedulerDiscordBot.discordListeners.model.PartialPost;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
@@ -10,9 +9,11 @@ import net.dv8tion.jda.api.entities.emoji.RichCustomEmoji;
 import org.springframework.stereotype.Service;
 
 import java.awt.*;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.List;
 import java.util.function.Consumer;
 
 @Service
@@ -43,10 +44,10 @@ public class RaidPostService {
         }));
     }
 
-    private MessageEmbed createEmbedPost(PartialPost partialPost, Date date, RichCustomEmoji emoji) {
+    private MessageEmbed createEmbedPost(PartialPost partialPost, Instant date, RichCustomEmoji emoji) {
         EmbedBuilder embedBuilder = new EmbedBuilder();
         embedBuilder.setTitle("Raid Incoming!");
-        embedBuilder.setDescription("<t:" + date.toInstant().getEpochSecond() + ":R>");
+        embedBuilder.setDescription("<t:" + date.getEpochSecond() + ":R>");
         embedBuilder.setColor(Color.orange);
         embedBuilder.setThumbnail("https://i.insider.com/5800ec6c52dd73d0018b4e21?width=750&format=jpeg&auto=webp");
         embedBuilder.addField("Raid", partialPost.getRaidName(), false);
@@ -72,17 +73,16 @@ public class RaidPostService {
         return embedBuilder.build();
     }
 
-    private String getVoteField(Map<RichCustomEmoji, Date> emojiDateMap) {
+    private String getVoteField(Map<RichCustomEmoji, Instant> emojiDateMap) {
         ArrayList<String> lines = new ArrayList<>();
         emojiDateMap.forEach((emoji, date) -> lines.add(emoji.getFormatted() + " - " + formatDateTime(date)));
         return String.join("\n", lines);
     }
 
-    private String formatDateTime(Date dateTime) {
-        SimpleDateFormat outputFormatterDate = new SimpleDateFormat("EEEE, dd MMM", Locale.UK);
-        String date = outputFormatterDate.format(dateTime);
-        SimpleDateFormat outputFormatterTime = new SimpleDateFormat("h:mma", Locale.UK);
-        String time = outputFormatterTime.format(dateTime);
-        return date + " at " + time;
+    private String formatDateTime(Instant dateTime) {
+        ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(dateTime, ZoneId.systemDefault());
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("EEEE, dd MMM");
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("h:mma z");
+        return zonedDateTime.format(dateFormatter) + " at " + zonedDateTime.format(timeFormatter);
     }
 }

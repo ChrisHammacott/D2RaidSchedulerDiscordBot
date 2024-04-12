@@ -18,6 +18,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
@@ -47,7 +48,7 @@ public class RaidRestController {
         raidPostService.postRaidListing(partialPost, (messageId) -> {
             RaidInfo raidInfo = new RaidInfo(partialPost.getRaidName(), messageId, partialPost.getPostChannel(), partialPost.getReminderChannel(), partialPost.getMinRaiders(), convertEmojiDateMap(partialPost.getEmojiDateHashMap()));
             raidInfoService.save(raidInfo);
-            reminderSchedulerService.scheduleCloseRaidPost(partialPost.getLastDate().getTime(), messageId);
+            reminderSchedulerService.scheduleCloseRaidPost(partialPost.getLastDate().toEpochMilli(), messageId);
             logger.info("Raid Post Created");
         });
         return RaidViewController.createRaidForm(jda, model, configService.getConfig()).trigger("updateRaidList").build();
@@ -56,20 +57,20 @@ public class RaidRestController {
     private PartialPost convertToPartialPost(CreateRaidInfoFormData formData) {
         Role role = jda.getRoleById(formData.getMentionRoleId());
         String organiser = jda.getUserById(formData.getUserId()).getAsMention();
-        HashMap<RichCustomEmoji, Date> emojiDateHashMap = new HashMap<>();
+        HashMap<RichCustomEmoji, Instant> emojiDateHashMap = new HashMap<>();
         List<RichCustomEmoji> emojiList = new ArrayList<>(jda.getEmojis());
         for (LocalDateTime localDateTime : formData.getDateTimeList()) {
             RichCustomEmoji emoji = emojiList.get(new Random().nextInt(emojiList.size()));
-            emojiDateHashMap.put(emoji, new Date(localDateTime.atZone(ZoneId.systemDefault()).toEpochSecond()));
+            emojiDateHashMap.put(emoji, localDateTime.atZone(ZoneId.systemDefault()).toInstant());
             emojiList.remove(emoji);
         }
         return new PartialPost(formData.getRaidName(), formData.getPostChannelId(), formData.getReminderChannelId(), role, organiser, formData.getMinRaiders(), emojiDateHashMap, formData.getMessage());
     }
 
-    private Map<Long, Long> convertEmojiDateMap(Map<RichCustomEmoji, Date> emojiDateMap) {
+    private Map<Long, Long> convertEmojiDateMap(Map<RichCustomEmoji, Instant> emojiDateMap) {
         Map<Long, Long> newMap = new HashMap<>();
         for (var entry : emojiDateMap.entrySet()) {
-            newMap.put(entry.getKey().getIdLong(), entry.getValue().getTime());
+            newMap.put(entry.getKey().getIdLong(), entry.getValue().toEpochMilli());
         }
         return newMap;
     }

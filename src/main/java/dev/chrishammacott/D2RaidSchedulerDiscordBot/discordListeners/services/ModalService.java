@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.*;
 
 @Service
@@ -47,10 +48,10 @@ public class ModalService {
         }
         partialPost.setMessage(message);
 
-        HashMap<RichCustomEmoji, Date> emojiDateHashMap = new HashMap<>();
+        HashMap<RichCustomEmoji, Instant> emojiDateHashMap = new HashMap<>();
         List<RichCustomEmoji> emojiList = event.getGuild().getEmojis();
         RichCustomEmoji emoji = emojiList.get(new Random().nextInt(emojiList.size()));
-        emojiDateHashMap.put(emoji, dateTime);
+        emojiDateHashMap.put(emoji, dateTime.toInstant());
 
         partialPost.setEmojiDateHashMap(emojiDateHashMap);
         partialPost.setMessage(message);
@@ -58,7 +59,7 @@ public class ModalService {
         raidPostService.postRaidListing(partialPost, (messageId) -> {
             RaidInfo raidInfo = new RaidInfo(partialPost.getRaidName(), messageId, partialPost.getPostChannel(), partialPost.getReminderChannel(), partialPost.getMinRaiders(), convertEmojiDateMap(partialPost.getEmojiDateHashMap()));
             raidInfoService.save(raidInfo);
-            reminderSchedulerService.scheduleCloseRaidPost(partialPost.getLastDate().getTime(), messageId);
+            reminderSchedulerService.scheduleCloseRaidPost(partialPost.getLastDate().toEpochMilli(), messageId);
             logger.info("Raid Post Created");
         });
         event.reply("Raid Post has been queued").queue();
@@ -70,10 +71,10 @@ public class ModalService {
         return inputFormatter.parse(dateTimeString);
     }
 
-    private Map<Long, Long> convertEmojiDateMap(Map<RichCustomEmoji, Date> emojiDateMap) {
+    private Map<Long, Long> convertEmojiDateMap(Map<RichCustomEmoji, Instant> emojiDateMap) {
         Map<Long, Long> newMap = new HashMap<>();
         for (var entry : emojiDateMap.entrySet()) {
-            newMap.put(entry.getKey().getIdLong(), entry.getValue().getTime());
+            newMap.put(entry.getKey().getIdLong(), entry.getValue().toEpochMilli());
         }
         return newMap;
     }

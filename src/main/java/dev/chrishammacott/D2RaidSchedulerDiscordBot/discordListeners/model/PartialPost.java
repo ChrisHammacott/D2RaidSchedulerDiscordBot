@@ -3,6 +3,7 @@ package dev.chrishammacott.D2RaidSchedulerDiscordBot.discordListeners.model;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.emoji.RichCustomEmoji;
 
+import java.time.Instant;
 import java.util.*;
 
 
@@ -14,10 +15,10 @@ public class PartialPost {
     private final Role mentionRole;
     private final String organiser;
     private final int minRaiders;
-    private HashMap<RichCustomEmoji, Date> emojiDateHashMap;
+    private HashMap<RichCustomEmoji, Instant> emojiDateHashMap;
     private String message;
 
-    public PartialPost(String raidName, Long postChannel, Long reminderChannel, Role mentionRole, String organiser, Integer minRaiders, HashMap<RichCustomEmoji, Date> emojiDateHashMap, String message) {
+    public PartialPost(String raidName, Long postChannel, Long reminderChannel, Role mentionRole, String organiser, Integer minRaiders, HashMap<RichCustomEmoji, Instant> emojiDateHashMap, String message) {
         this.raidName = raidName;
         this.postChannel = postChannel;
         this.reminderChannel = reminderChannel;
@@ -61,7 +62,7 @@ public class PartialPost {
         return minRaiders;
     }
 
-    public HashMap<RichCustomEmoji, Date> getEmojiDateHashMap() {
+    public HashMap<RichCustomEmoji, Instant> getEmojiDateHashMap() {
         return emojiDateHashMap;
     }
 
@@ -69,18 +70,18 @@ public class PartialPost {
         return message;
     }
 
-    public Date getLastDate() {
-        List<Date> list = new ArrayList<Date>(emojiDateHashMap.values());
-        Date lastDate = new Date(0);
-        for (Date date : list) {
-            if (date.after(lastDate)) {
+    public Instant getLastDate() {
+        List<Instant> list = new ArrayList<>(emojiDateHashMap.values());
+        Instant lastDate = Instant.ofEpochMilli(0);
+        for (Instant date : list) {
+            if (date.isAfter(lastDate)) {
                 lastDate = date;
             }
         }
         return lastDate;
     }
 
-    public void setEmojiDateHashMap(HashMap<RichCustomEmoji, Date> emojiDateHashMap) {
+    public void setEmojiDateHashMap(HashMap<RichCustomEmoji, Instant> emojiDateHashMap) {
         this.emojiDateHashMap = emojiDateHashMap;
     }
 

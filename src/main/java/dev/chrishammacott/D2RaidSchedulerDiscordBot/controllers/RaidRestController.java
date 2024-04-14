@@ -61,7 +61,7 @@ public class RaidRestController {
         List<RichCustomEmoji> emojiList = new ArrayList<>(jda.getEmojis());
         for (LocalDateTime localDateTime : formData.getDateTimeList()) {
             RichCustomEmoji emoji = emojiList.get(new Random().nextInt(emojiList.size()));
-            emojiDateHashMap.put(emoji, localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+            emojiDateHashMap.put(emoji, localDateTime.atZone(ZoneId.of("Europe/London")).toInstant());
             emojiList.remove(emoji);
         }
         return new PartialPost(formData.getRaidName(), formData.getPostChannelId(), formData.getReminderChannelId(), role, organiser, formData.getMinRaiders(), emojiDateHashMap, formData.getMessage());

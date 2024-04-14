@@ -80,7 +80,7 @@ public class RaidPostService {
     }
 
     private String formatDateTime(Instant dateTime) {
-        ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(dateTime, ZoneId.systemDefault());
+        ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(dateTime, ZoneId.of("Europe/London"));
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("EEEE, dd MMM");
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("h:mma z");
         return zonedDateTime.format(dateFormatter) + " at " + zonedDateTime.format(timeFormatter);

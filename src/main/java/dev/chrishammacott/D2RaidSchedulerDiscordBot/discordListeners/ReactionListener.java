@@ -170,7 +170,7 @@ public class ReactionListener extends ListenerAdapter {
 
     private void activateRaid(Guild guild, RaidInfo raidInfo, long eventEmojiId) {
         guild.createRole()
-            .setName("RaidTeam-" + ReactionPostService.getDateIdentifier(raidInfo.getDateTime(eventEmojiId)))
+            .setName("Raid Team")
             .setColor(Color.orange)
             .queue(role -> {
                 logger.info("Created role [{}], for [{}]", role.getIdLong(), raidInfo.getPostId());

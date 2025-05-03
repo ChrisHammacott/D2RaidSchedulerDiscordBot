@@ -9,7 +9,6 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import net.dv8tion.jda.api.entities.emoji.RichCustomEmoji;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -27,7 +26,7 @@ import java.util.Optional;
 public class ReactionListener extends ListenerAdapter {
 
     Logger logger = LoggerFactory.getLogger(this.getClass());
-    @Value("${bot.id}")
+    @Value("${discord.botId}")
     private Long BOT_ID;
     private final JDA jda;
     private final ReactionPostService reactionPostService;

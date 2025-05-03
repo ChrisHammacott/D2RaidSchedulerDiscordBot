@@ -1,15 +1,24 @@
-$VERSION="2.0.3"
+$VERSION="2.1.0"
+$IMAGE = "server:5000/raidschedulerbot"
+
+$IMAGE_WITH_VERSION = -join($IMAGE, ":", $VERSION)
+$IMAGE_LATEST = -join($IMAGE, ":latest")
 
 mvn clean install -DskipTests
 
 docker buildx create --use --name buildx_instance
 
 #build x86 version
-docker buildx build -t raidschedulerbot:$VERSION --build-arg BOT_VERSION=$VERSION --load .
-#build arm version
-docker buildx build --platform linux/arm64 -t raidschedulerbot-arm:$VERSION --build-arg BOT_VERSION=$VERSION --load .
+docker buildx build . --load `
+--platform linux/amd64 `
+--build-arg VERSION=$VERSION `
+--tag $IMAGE_WITH_VERSION `
+--tag $IMAGE_LATEST
 
 docker buildx stop buildx_instance
 
-#save image to deploy to server
-docker save --output raidschedulerbot-arm-$VERSION.tar raidschedulerbot-arm:$VERSION
+docker push $IMAGE_WITH_VERSION
+docker push $IMAGE_LATEST
+
+git tag v$VERSION
+git push origin tag v$VERSION

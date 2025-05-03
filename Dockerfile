@@ -1,11 +1,15 @@
-FROM openjdk:17
+FROM ubuntu:24.04
 
-ARG BOT_VERSION
+ARG VERSION
 
 RUN mkdir /app
 WORKDIR /app
 
-COPY target/D2RaidSchedulerDiscordBot-${BOT_VERSION}.jar /app/D2RaidSchedulerDiscordBot.jar
-COPY ../.env /app
+RUN apt update && apt upgrade -y
+RUN apt install -y openjdk-17-jdk
 
-CMD java -jar D2RaidSchedulerDiscordBot.jar
+COPY target/D2RaidSchedulerDiscordBot-${VERSION}.jar /app/D2RaidSchedulerDiscordBot.jar
+
+EXPOSE 8080
+
+ENTRYPOINT ["java","-jar","D2RaidSchedulerDiscordBot.jar"]

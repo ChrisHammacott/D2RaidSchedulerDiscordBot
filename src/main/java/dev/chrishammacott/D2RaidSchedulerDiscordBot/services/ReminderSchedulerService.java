@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 public class ReminderSchedulerService {
 
     Logger logger = LoggerFactory.getLogger(this.getClass());
-    @Value("${reminder.offset}")
+    @Value("${d2scheduler.reminder.offset}")
     private Long REMINDER_OFFSET;
     private final ScheduledExecutorService scheduleReminders = Executors.newSingleThreadScheduledExecutor();
     private final RaidInfoService raidInfoService;

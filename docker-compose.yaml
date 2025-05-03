@@ -1,20 +1,16 @@
-version: '3.8'
-
 services:
-  bot:
-    image: raidschedulerbot:2.0.0
-    container_name: schedulerBot
+  raid_scheduler:
+    container_name: raid-scheduler-service
+    image: server:5000/raidschedulerbot:latest
     ports:
-      - '8080:8080'
-    restart: always
+      - '8081:8080'
   mongodb:
-    image: mongo:latest
     container_name: mongodb
+    image: mongo:8.0.5
     ports:
       - '27017:27017'
     volumes:
       - data:/data
-    restart: always
 volumes:
   data : {}
 networks:

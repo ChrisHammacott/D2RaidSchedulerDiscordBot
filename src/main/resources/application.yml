@@ -13,7 +13,7 @@ spring:
 
 discord:
   token: ${DISCORD_TOKEN}
-  botId: ${DISCORD_BOT_ID} # 1173022493229990008
+  botId: ${DISCORD_BOT_ID}
 
 d2scheduler:
   reminder:

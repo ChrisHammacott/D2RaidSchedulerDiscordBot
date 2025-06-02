@@ -6,6 +6,7 @@ import dev.chrishammacott.D2RaidSchedulerDiscordBot.database.model.Config;
 import dev.chrishammacott.D2RaidSchedulerDiscordBot.database.services.ConfigService;
 import dev.chrishammacott.D2RaidSchedulerDiscordBot.database.services.RaidInfoService;
 import io.github.wimdeblauwe.htmx.spring.boot.mvc.HtmxResponse;
+import io.github.wimdeblauwe.htmx.spring.boot.mvc.HxRefresh;
 import io.github.wimdeblauwe.htmx.spring.boot.mvc.HxRequest;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.channel.ChannelType;

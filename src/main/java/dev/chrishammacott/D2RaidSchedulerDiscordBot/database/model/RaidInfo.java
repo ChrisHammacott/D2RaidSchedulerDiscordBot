@@ -87,6 +87,14 @@ public class RaidInfo {
     public Map<Long, List<Long>> getEmojiUserListMap() {
         return emojiUserListMap;
     }
+    public boolean isInDate(long datetime) {
+        for (var entry : emojiDateTimeMap.entrySet()) {
+            if (entry.getValue() > datetime) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     public boolean hasVote() {
         return emojiDateTimeMap.size() > 1;

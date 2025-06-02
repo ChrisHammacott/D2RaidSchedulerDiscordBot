@@ -38,19 +38,19 @@ public class ReactionPostService {
         return user.getAsMention() + " is now part of the raid Team due to a drop out. cc" + role.getAsMention();
     }
 
-    public String getTeamPost(Role role, List<User> userList) {
+    public String getTeamPost(Role role, List<Long> userList) {
         if (userList.size() == 6) {
             return  getTeamPost(role, userList, "has a full raid team!");
         }
         return getTeamPost(role, userList, "has met the minimum raiders!");
     }
 
-    private String getTeamPost(Role raidTeamRole, List<User> userList, String topLine){
+    private String getTeamPost(Role raidTeamRole, List<Long> userList, String topLine){
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(raidTeamRole.getAsMention()).append("  ").append(topLine).append("\n");
         stringBuilder.append("Raid Team:").append("\n");
-        for (User user : userList) {
-            stringBuilder.append(user.getAsMention()).append("\n");
+        for (Long userId : userList) {
+            stringBuilder.append(jda.getUserById(userId).getAsMention()).append("\n");
         }
         return stringBuilder.toString();
     }
